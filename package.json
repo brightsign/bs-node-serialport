@@ -1,0 +1,21 @@
+{
+  "name": "bs-node-serialport",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "support@brightsign.biz (http://www.brightsign.biz/)",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^10.0.0",
+    "serialport": "^8.0.7"
+  },
+  "devDependencies": {
+    "debug": "^4.1.1",
+    "webpack": "4.42.1",
+    "webpack-cli": "3.3.11"
+  }
+}
