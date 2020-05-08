@@ -32,8 +32,9 @@ class BrightSignBinding extends AbstractBinding {
   async open(path, options) {
     await super.open(path, options)
     
-    // '/dev/ttyS0' maps to BrightSign's Port 0 
-    let serial = new BSSerialPort(0);
+    // '/dev/ttyS0' maps to BrightSign's Port 0, 3.5mm Serial/RS232
+    // BrightSign's Port 2, USB Serial
+    let serial = new BSSerialPort(options.port);
 
     serial.SetBaudRate(options.baudRate);
     serial.SetDataBits(options.dataBits);

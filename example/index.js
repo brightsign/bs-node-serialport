@@ -11,6 +11,7 @@ function main() {
   SerialPort.Binding = BrightSignBinding;
 
   const options = {
+    port: 2, // Port 0, 3.5mm Serial/RS232, Port 2, USB Serial
     baudRate: 115200, // Update to reflect the expected baud rate
     dataBits: 8,
     stopBits: 1,
