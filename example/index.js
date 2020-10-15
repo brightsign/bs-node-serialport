@@ -2,7 +2,8 @@
 // process.env.DEBUG ="*"
 
 var SerialPort = require('@serialport/stream');
-var BrightSignBinding = require('../src/bs-binding');
+// @brightsign/serialport is supported in OS 8.2.26+, this is replacing the /src/bs-binding.js
+var BrightSignBinding = require('@brightsign/serialport');
 var ByteLength = require('@serialport/parser-byte-length');
 
 var path = '/dev/ttyS0';
