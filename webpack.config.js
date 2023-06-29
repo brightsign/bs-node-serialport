@@ -21,5 +21,8 @@ module.exports = {
   target: 'node',
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
+  },
+  externals: {
+    '@brightsign/serialport': 'commonjs @brightsign/serialport',
   }
 };
