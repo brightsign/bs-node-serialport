@@ -8,7 +8,16 @@ var ByteLength = require('@serialport/parser-byte-length');
 
 var path = '/dev/ttyS0';
 
-function main() {
+var SerialPortListClass = require("@brightsign/serialportlist");
+var serialPortList = new SerialPortListClass();
+var devices = [{}, {}];
+
+async function main() {
+  console.log(path);
+
+  const serialPorts = await serialPortList.getList();
+  console.log(JSON.stringify(serialPorts));
+
   SerialPort.Binding = BrightSignBinding;
 
   const options = {
@@ -21,17 +30,17 @@ function main() {
     module_root: '/storage/sd' // Source for where serialport will look for the underlying module
   }
 
-  var port = new SerialPort(path, options); 
-  var parser = port.pipe(new ByteLength({length: 1}));
-  
+  var port = new SerialPort(path, options);
+  var parser = port.pipe(new ByteLength({ length: 1 }));
+
   port.open(function (err) {
     if (err) {
       return console.log('Error opening port: ', err.message)
     }
-    console.log(`connected to ${path}, isOpen: ${port.isOpen}`);
+    console.log(`connected to serial ${path}, isOpen: ${port.isOpen}`);
 
     // Transmitter
-    port.write('abc', function(err) {
+    port.write('abc', function (err) {
       if (err) {
         console.log(err);
         return console.log('Error on write: ', err.message)
@@ -41,19 +50,19 @@ function main() {
     })
 
   });
-  
+
   // Receiver
-  parser.on('data', function(data) {
+  parser.on('data', function (data) {
     console.log("Parsed data: " + data);
   });
 
   // Open errors will be emitted as an error event
-  port.on('error', function(err) {
+  port.on('error', function (err) {
     console.log(err);
     console.log('Error: ', err.message)
   })
 
-  console.log(`After serialport creation`);
+  console.log(`After port creation`);
 
 }
 

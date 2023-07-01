@@ -24,5 +24,6 @@ module.exports = {
   },
   externals: {
     '@brightsign/serialport': 'commonjs @brightsign/serialport',
+    '@brightsign/serialportlist': 'commonjs @brightsign/serialportlist',
   }
 };
