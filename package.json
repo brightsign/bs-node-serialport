@@ -14,7 +14,7 @@
   "author": "support@brightsign.biz (http://www.brightsign.biz/)",
   "license": "MIT",
   "dependencies": {
-    "@types/node": "^10.0.0",
+    "@types/node": "^14.16.0",
     "serialport": "^8.0.7"
   },
   "devDependencies": {

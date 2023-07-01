@@ -5,13 +5,13 @@ else
 PLAYER=$1
 PLAYER_PW=$2
 fi
-for f in example/*.html example/*.js example/autorun.brs 
+for f in *.html src/*.js src/autorun.brs 
 do
 	echo $f
 	curl --location --request PUT "http://$PLAYER/api/v1/files/sd" --form "=@"$f"" | jq -r .data.result.results[0]
 done
 
-for f in example/dist/*
+for f in dist/*
 do
 	echo $f
 	curl --location --request PUT "http://$PLAYER/api/v1/files/sd/dist" --form "=@"$f"" | jq -r .data.result.results[0]
