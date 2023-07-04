@@ -4,9 +4,10 @@
 var SerialPort = require('@serialport/stream');
 // @brightsign/serialport is supported in OS 8.2.26+, this is replacing the /src/bs-binding.js
 var BrightSignBinding = require('@brightsign/serialport');
-var ByteLength = require('@serialport/parser-byte-length');
+var ReadlineParser = require('@serialport/parser-readline');
 
-var path = '/dev/ttyS0';
+// var path = '/dev/ttyS0';
+var path = '/dev/ttyUSB0';
 
 var SerialPortListClass = require("@brightsign/serialportlist");
 var serialPortList = new SerialPortListClass();
@@ -31,11 +32,11 @@ async function main() {
   }
 
   var port = new SerialPort(path, options);
-  var parser = port.pipe(new ByteLength({ length: 1 }));
+  var parser = port.pipe(new ReadlineParser());
 
   port.open(function (err) {
     if (err) {
-      return console.log('Error opening port: ', err.message)
+      return console.log(`Error opening port: ${err.message}`);
     }
     console.log(`connected to serial ${path}, isOpen: ${port.isOpen}`);
 
@@ -43,23 +44,23 @@ async function main() {
     port.write('abc', function (err) {
       if (err) {
         console.log(err);
-        return console.log('Error on write: ', err.message)
+        return console.log(`Error on write: ${err.message}`);
       }
 
-      console.log('message written')
+      console.log('message written');
     })
 
   });
 
   // Receiver
   parser.on('data', function (data) {
-    console.log("Parsed data: " + data);
+    console.log(`Parsed data: ${data}`);
   });
 
   // Open errors will be emitted as an error event
   port.on('error', function (err) {
     console.log(err);
-    console.log('Error: ', err.message)
+    console.log(`Error: ${err.message}`);
   })
 
   console.log(`After port creation`);
