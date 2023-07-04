@@ -1,17 +1,21 @@
 // Serialport's debug capabilities enable/disable
 // process.env.DEBUG ="*"
 
-var SerialPort = require('@serialport/stream');
+const SerialPort = require('@serialport/stream');
 // @brightsign/serialport is supported in OS 8.2.26+, this is replacing the /src/bs-binding.js
-var BrightSignBinding = require('@brightsign/serialport');
-var ReadlineParser = require('@serialport/parser-readline');
+const BrightSignBinding = require('@brightsign/serialport');
+const ReadlineParser = require('@serialport/parser-readline');
 
-// var path = '/dev/ttyS0';
-var path = '/dev/ttyUSB0';
+const path = '/dev/ttyS0';
+// var path = '/dev/ttyUSB0';
 
-var SerialPortListClass = require("@brightsign/serialportlist");
-var serialPortList = new SerialPortListClass();
-var devices = [{}, {}];
+const SerialPortListClass = require("@brightsign/serialportlist");
+const serialPortList = new SerialPortListClass();
+let devices = [{}, {}];
+
+let port;
+
+let count = 0;
 
 async function main() {
   console.log(path);
@@ -22,7 +26,7 @@ async function main() {
   SerialPort.Binding = BrightSignBinding;
 
   const options = {
-    port: 2, // Port 0, 3.5mm Serial/RS232, Port 2, USB Serial
+    port: 0, // Port 0, 3.5mm Serial/RS232, Port 2, USB Serial
     baudRate: 115200, // Update to reflect the expected baud rate
     dataBits: 8,
     stopBits: 1,
@@ -30,26 +34,15 @@ async function main() {
     autoOpen: false,
     module_root: '/storage/sd' // Source for where serialport will look for the underlying module
   }
-
-  var port = new SerialPort(path, options);
-  var parser = port.pipe(new ReadlineParser());
+  port = new SerialPort(path, options);
+  let parser = port.pipe(new ReadlineParser());
 
   port.open(function (err) {
     if (err) {
       return console.log(`Error opening port: ${err.message}`);
     }
     console.log(`connected to serial ${path}, isOpen: ${port.isOpen}`);
-
-    // Transmitter
-    port.write('abc', function (err) {
-      if (err) {
-        console.log(err);
-        return console.log(`Error on write: ${err.message}`);
-      }
-
-      console.log('message written');
-    })
-
+    writeOut();
   });
 
   // Receiver
@@ -64,7 +57,20 @@ async function main() {
   })
 
   console.log(`After port creation`);
+}
 
+function writeOut() {
+  // Transmitter
+  port.write((`sent from ${path} count: ${count}\n`), function (err) {
+    if (err) {
+      console.log(err);
+      return console.log(`Error on write: ${err.message}`);
+    }
+
+    // console.log('message written');
+    count+=1;
+    setTimeout(writeOut, 1000);
+  });
 }
 
 window.main = main;

@@ -17,6 +17,12 @@ npm run cp
 Deploy the bundled application to the player through the DWS APIs. See 
 [Enabling development tools on the Player ](#enable-player-development-tools) for more info.
 
+## Development Prerequisites
+
+Supporting scripting relies on [jq](https://stedolan.github.io/jq/download/) - if you don't use it already you should.
+
+Working at the command line is made much easier through using environment variables, and that is simplified using [direnv](https://direnv.net/docs/installation.html).  Highly recommended.
+
 ## Preparing the Player for development
 ---
 Your player needs to be setup with the console and the BrightScript debugger enabled to be used with the 3.5mm Serial Port and DWS. It's also usually a good idea to start with a player that is freshly factory reset.
