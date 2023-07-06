@@ -25,8 +25,18 @@ async function main() {
 
   SerialPort.Binding = BrightSignBinding;
 
+  
+  let portSerial35mm = createSerialPort(0, "/dev/ttyS0", "portSerial35mm");
+  let countTx = 0;
+  setTimeout(writeOut, 1000, portSerial35mm, countTx);
+  
+  let portSerialUSBA = createSerialPort(2, "/dev/ttyUSB0", "portSerialUSBA");
+}
+
+function createSerialPort(portNumber, path, name) {
+
   const options = {
-    port: 0, // Port 0, 3.5mm Serial/RS232, Port 2, USB Serial
+    port: portNumber, // Port 0, 3.5mm Serial/RS232, Port 2, USB Serial
     baudRate: 115200, // Update to reflect the expected baud rate
     dataBits: 8,
     stopBits: 1,
@@ -34,6 +44,7 @@ async function main() {
     autoOpen: false,
     module_root: '/storage/sd' // Source for where serialport will look for the underlying module
   }
+   
   port = new SerialPort(path, options);
   let parser = port.pipe(new ReadlineParser());
 
@@ -42,12 +53,11 @@ async function main() {
       return console.log(`Error opening port: ${err.message}`);
     }
     console.log(`connected to serial ${path}, isOpen: ${port.isOpen}`);
-    writeOut();
   });
 
   // Receiver
   parser.on('data', function (data) {
-    console.log(`Parsed data: ${data}`);
+    console.log(`Received on ${path} parsed data: ${data}`);
   });
 
   // Open errors will be emitted as an error event
@@ -56,20 +66,22 @@ async function main() {
     console.log(`Error: ${err.message}`);
   })
 
-  console.log(`After port creation`);
+  return port;
 }
 
-function writeOut() {
-  // Transmitter
-  port.write((`sent from ${path} count: ${count}\n`), function (err) {
+// Transmitter
+function writeOut(serialPort, count) {
+  let msg = `sent from ${serialPort.path} count: ${count}\n`;
+  serialPort.write((msg), function (err) {
     if (err) {
       console.log(err);
       return console.log(`Error on write: ${err.message}`);
     }
 
-    // console.log('message written');
-    count+=1;
-    setTimeout(writeOut, 1000);
+    console.log(`${serialPort.path} message written`);
+
+    count += 1;
+    setTimeout(writeOut, 1000, serialPort, count);
   });
 }
 
