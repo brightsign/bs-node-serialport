@@ -6,22 +6,17 @@ This reference currently assumes USB-A is sending to USB-C serial protocol. It m
 
 ## Getting Started
 ---
-After cloning the repo and changing to it's directory, do the following. 
+After cloning the repo and changing to it's directory, do the following.
 
 ```bash
 npm i
-npm run build
-npm run cp 
+npm run build:dev
 ```
 
 Deploy the bundled application to the player through the DWS APIs. See 
-[Enabling development tools on the Player ](#enable-player-development-tools) for more info.
+[Enabling development tools on the Player ](#enable-player-development-tools) to enable the DWS, and [Deploying Code Remotely](#deploy-code) to deploy the code. 
 
-## Development Prerequisites
-
-Supporting scripting relies on [jq](https://stedolan.github.io/jq/download/) - if you don't use it already you should.
-
-Working at the command line is made much easier through using environment variables, and that is simplified using [direnv](https://direnv.net/docs/installation.html).  Highly recommended.
+Alternatively, the bundled example, `dist/bundle`, `autorun.brs`, `index.html` can be copied to the root of the Micro SD card and insert into the player. Apply power to the player.
 
 ## Preparing the Player for development
 ---
@@ -43,11 +38,17 @@ registry write html enable_web_inspector 1
 reboot
 ```
 
+#### Verifying TX and RX functionality
+
+The BrightSign's log output when enabled, is sent over the 3.5mm Serial Port by default. 
+
+This example application can receive the player console either outputted through the 3.5mm or via telnet / ssh (see [Telnet and SSH](https://brightsign.atlassian.net/wiki/spaces/DOC/pages/370673607/Telnet+and+SSH#Enabling-Telnet) for info on enabling either). The USB Serial Port will also log a message when it receives serial data -  for this application it will come from the 3.5mm console output or the Serial Port write command sending serial data over the 3.5mm port. 
+
 See [Deploying Code Remotely](#deploy-code) for info on how to deploy the code. 
 
 ### Enabling Console
 
-This is not necessary, though receiving console output over a serial cable or SSH connected to your PC gives insight into the application. Alternatively logs can be viewed in the DWS. You will need a serial cable and adapter for your computer, connected to the BrightSign's 3.5mm Serial Port.
+This is not necessary, though receiving console output over a serial cable or Telnet / SSH connected to your PC gives insight into the application. Alternatively logs can be viewed in the DWS. You will need a serial cable and adapter for your computer, connected to the BrightSign's 3.5mm Serial Port.
 
 At the prompt, you can find the USB port by entering
 ```bash
@@ -76,16 +77,20 @@ reboot
 
 ## Development lifecycle
 ---
+
 ### Deploying Code to the Player
 
 ### <a id="deploy-code"></a>
 
-On your PC, set the following environment variables (direnv is your friend):
+The underlying shell scripts (used by `npm scripts`) require [jq](https://stedolan.github.io/jq/download/). 
+
+Working at the command line is made much easier through using environment variables, and that is simplified using [direnv](https://direnv.net/docs/installation.html).  Highly recommended.
+
+If the following environment variables have not been set, on your PC, go ahead and set them (direnv is your friend):
 
 ```
 export PLAYER={your XC5 IP address or hostname}
 export PLAYER_PW={the pw for that player, by default it's serial number}
-export PLAYER_STORAGE="<sd | ssd">
 ```
 
 The file scripts/put uses the DWS API to move files to the player.  If your application builds additional files you will need to add them to that script in the line that lists the files to copy.  For example:
@@ -106,16 +111,20 @@ You should see the results of the webpack build, followed by a list of the files
 
 ### Starting the App on the Player
 
-Just copying the files will not restart your application on the player.  From a serial or SSH session to the player:
+Just copying the files will not restart your application on the player.  From a serial or Telnet / SSH session to the player:
 
-```
-ctrl-C
-BrightScript Debugger> exit
-BrightSign> script autorun.brs
-```
+Restarting the application can be done via, 
+* rebooting the player (`npm run rp`)
+* OR, BrightSign Shell commands below,
+  ```
+  ctrl-C
+  BrightScript Debugger> exit
+  BrightSign> script autorun.brs
+  ```
+
 Ctrl-C will break out of the autorun into the debugger, which you then `exit` and then run `script autorun.brs`  to start that autorun.
 
-Alternatively, if Serial or SSH access is not configured, the player can be restarted by pressing the "Reset" button on the BrightSign, or re-applying power.
+Alternatively, if DWS API or Serial / Telnet / SSH access is not configured, the player can be restarted by pressing the "Reset" button on the BrightSign, or re-applying power.
 
 ## How to define/find the correct path for BrightSign SerialPort:
 
