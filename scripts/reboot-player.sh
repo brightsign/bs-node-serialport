@@ -17,7 +17,7 @@ for var in "${optional_vars[@]}"; do
   fi
 done
 
-echo "copying files to $PLAYER"
+echo "rebooting $PLAYER"
 
 # add digest auth when DWS password is set
 if [ -z $PLAYER_PW ]; then 
@@ -25,17 +25,5 @@ if [ -z $PLAYER_PW ]; then
 else 
   AUTH="--digest --user admin:$PLAYER_PW"
 fi
-echo "AUTH: $AUTH"
 
-# fi
-for f in *.html src/*.js src/autorun.brs 
-do
-	echo $f
-	curl $AUTH --location --request PUT "http://$PLAYER/api/v1/files/sd" --form "=@"$f"" | jq -r .data
-done
-
-for f in dist/*
-do
-	echo $f
-	curl $AUTH --location --request PUT "http://$PLAYER/api/v1/files/sd/dist" --form "=@"$f"" | jq -r .data
-done
+curl $AUTH --location --request PUT "http://$PLAYER/api/v1/control/reboot" | jq -r .data

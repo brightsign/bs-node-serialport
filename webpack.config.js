@@ -3,10 +3,10 @@ const path = require('path');
 
 module.exports = {
   devtool: 'inline-source-map',
-  entry: './example/index.js',
+  entry: './src/index.js',
   output: {
     filename: './bundle.js',
-    path: path.resolve(__dirname + '/example', 'dist')
+    path: path.resolve(__dirname, 'dist')
   },
   module: {
     rules: [{
