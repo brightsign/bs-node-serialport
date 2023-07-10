@@ -1,4 +1,6 @@
 # List of required and optional environment variables
+
+: '
 required_vars=("PLAYER")
 optional_vars=("PLAYER_PW")
 
@@ -16,6 +18,8 @@ for var in "${optional_vars[@]}"; do
     echo "INFO: Environment variable $var is not set. Consider whether $var needs to be set."
   fi
 done
+
+'
 
 echo "copying files to $PLAYER"
 
