@@ -1,31 +1,35 @@
 # Basic Reference Implementation - JavaScript Serial Application
 
-This reference implementation is a Node app example which sends and receives serial data over the defined Serial Port. It introduces an approach to write HTML, Javascript, and Node.js for the BrightSign player. This is intended to be developed on your local machine, run and tested on a BrightSign unit. BrightAuthor:connected is not required for this application. 
+This reference implementation is an example Node app built to demonstrate sending Serial Data over the BrightSign's 3.5mm Serial connector to be received on the BrightSign's USB-A port - a loopback test.
 
-This reference currently assumes USB-A is sending to USB-C serial protocol. It may be the case the Player's log output is over the 3.5mm Serial Port or SSH/Telnet. 
+It introduces an approach to write HTML, Javascript, and Node.js for the BrightSign player. This is intended to be developed on your local machine, run and tested on a BrightSign unit. BrightAuthor:connected is not required for this application. 
 
 ## Getting Started
----
-After cloning the repo and changing to it's directory, do the following.
+
+After cloning the repo and changing to its directory, do the following.
 
 ```bash
-npm i
+npm install
 npm run build:dev
 ```
 
-Deploy the bundled application to the player through the DWS APIs. See 
-[Enabling development tools on the Player ](#enable-player-development-tools) to enable the DWS, and [Deploying Code Remotely](#deploy-code) to deploy the code. 
+1. Connect the 3.5mm cable to the BrightSign's 3.5mm serial port, with the USB end connected to either USB-A or USB-C. 
+2. From here the application can be ran on the player,
 
-Alternatively, the bundled example, `dist/bundle`, `autorun.brs`, `index.html` can be copied to the root of the Micro SD card and insert into the player. Apply power to the player.
+    **Deployment Method A:** Deploy the bundled application to the player through the DWS APIs. See [Enabling development tools on the Player](#enable-player-development-tools) to enable the DWS, and [Deploying Code Remotely](#deploy-code) to deploy the code. 
+
+    **Deployment Method B:** Alternatively, the bundled example, `dist/bundle`, `autorun.brs`, `index.html` can be copied to the root of the Micro SD card and insert into the player. Apply power to the player. 
+
+3. To verify the test is working, either verify output by viewing logs in [DWS](#enable-player-development-tools) or [SSH/Telnet](#verifying-tx-and-rx-functionality). 
 
 ## Preparing the Player for development
----
-Your player needs to be setup with the console and the BrightScript debugger enabled to be used with the 3.5mm Serial Port and DWS. It's also usually a good idea to start with a player that is freshly factory reset.
 
-### Enabling development tools on the Player 
-### <a id="enable-player-development-tools"></a>
+Your player needs to be setup with the console and the BrightScript debugger enabled to be used with the 3.5mm Serial Port and DWS. It's also usually a good idea to start with a player that is factory reset.
 
-`script debug on` will enable the BrightScript Debugger. Reboot the player and you will see logs on serial session. Press the SVC button and it will drop you to a BrightSign prompt.
+### Enabling development tools on the Player
+<a id="enable-player-development-tools"></a>
+
+`script debug on` executed at the *BrightSign Console* will enable the BrightScript Debugger. This command is a shortcut to writing the *networking* registry section, *debug on*. Reboot the player and you will see logs on serial session. Press the SVC button and it will drop you to a BrightSign prompt. 
 
 `registry write networking dwse on` will enable the DWS APIs to be accessible. Default password is the serial number of the player.
 
@@ -39,6 +43,8 @@ reboot
 ```
 
 #### Verifying TX and RX functionality
+<a id="verifying-tx-and-rx-functionality"></a>
+
 
 The BrightSign's log output when enabled, is sent over the 3.5mm Serial Port by default. 
 
@@ -60,7 +66,7 @@ For example, the USB port might be /dev/tty.usbserial in which case you can exec
 screen /dev/tty.usbserial 115200 
 ```
 
-Once connected, use the serial software of your choice (on linux and Mac, the "screen" command is quite popular and all you need).
+Once connected, use the serial software of your choice (on linux and Mac, the "screen" command is quite popular and all you need). PuTTY could be leveraged for Windows users.
 
 Power on the player with the SVC button pressed.  Be near your keyboard because in a few seconds you will see:
 
@@ -76,11 +82,9 @@ reboot
 ```
 
 ## Development lifecycle
----
 
 ### Deploying Code to the Player
-
-### <a id="deploy-code"></a>
+<a id="deploy-code"></a>
 
 The underlying shell scripts (used by `npm scripts`) require [jq](https://stedolan.github.io/jq/download/). 
 
@@ -99,8 +103,6 @@ The file scripts/put uses the DWS API to move files to the player.  If your appl
 for f in dist/*.html dist/*.js src/autorun.brs
 ```
 
-The current script copies all the html and js files in the dist folder, and the autorun from the source file.  If your app needs more files, add them to that line.
-
 To run the script you can either run it as a bash script from the command line, or from npm:
 
 ```
@@ -114,7 +116,7 @@ You should see the results of the webpack build, followed by a list of the files
 Just copying the files will not restart your application on the player.  From a serial or Telnet / SSH session to the player:
 
 Restarting the application can be done via, 
-* rebooting the player (`npm run rp`)
+* rebooting the player (`npm run rp`) or via the [DWS -> Control Tab](https://brightsign.atlassian.net/wiki/spaces/DOC/pages/370673541/Diagnostic+Web+Server#Control)
 * OR, BrightSign Shell commands below,
   ```
   ctrl-C
