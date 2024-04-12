@@ -1,11 +1,8 @@
 // Serialport's debug capabilities enable/disable
 // process.env.DEBUG ="*"
 
-const SerialPort = require('@serialport/stream');
+const { SerialPort, BrightSignBinding, v8Bindings } = require('./polyfillSerialPort');
 const ReadlineParser = require('@serialport/parser-readline');
-
-// @brightsign/serialport is supported in OS 8.2.26+, this is replacing the /src/bs-binding.js
-const BrightSignBinding = require('@brightsign/serialport');
 const SerialPortListClass = require("@brightsign/serialportlist");
 
 async function main() {
@@ -22,20 +19,27 @@ async function main() {
     return;
   }
 
-  for (p=0; p<serialPorts.length; p++) {
+  for (let p=0; p<serialPorts.length; p++) {
     if ("USB" == serialPorts[p]["fid"].substring(0,3)) {
       serialUsbPath = serialPorts[p]["path"];
     }
-    
+
     if ("UART" == serialPorts[p]["fid"].substring(0,4)) {
       serial35mmPath = serialPorts[p]["path"];
     }
   }
   console.log(JSON.stringify(serialPorts));
 
-  SerialPort.Binding = BrightSignBinding;
+  // Set the binding to BrightSignBinding if it exists
+  if (BrightSignBinding) {
+    // Determine whether BrightSignBinding is a v8 or v11 binding
+    const isV8Binding = typeof BrightSignBinding.SerialPort !== 'function';
+    
+    // If BrightSignBinding is a v8 binding, use v8Bindings from the polyfill
+    SerialPort.Binding = isV8Binding ? v8Bindings : BrightSignBinding;
+  }
 
- 
+  // Create serial ports using the selected binding
   let serialPort35mm = createSerialPort(serial35mmPath, "serialPort35mm");
   let countTx = 0;
   setTimeout(writeOut, 1000, serialPort35mm, countTx);
@@ -52,8 +56,8 @@ function createSerialPort(path, name) {
     parity: "none",
     autoOpen: false,
   }
-   
-  port = new SerialPort(path, options);
+
+  const port = new SerialPort(path, options);
   let parser = port.pipe(new ReadlineParser());
 
   port.open(function (err) {
@@ -68,7 +72,7 @@ function createSerialPort(path, name) {
     console.log(`Received on ${path} parsed data: ${data}`);
   });
 
-  // Open errors will be emitted as an error event
+    // Open errors will be emitted as an error event
   port.on('error', function (err) {
     console.log(err);
     console.log(`Error: ${err.message}`);
@@ -93,4 +97,6 @@ function writeOut(serialPort, count) {
   });
 }
 
-window.main = main;
+// if (typeof window !== 'undefined') {
+  window.main = main;
+// }
