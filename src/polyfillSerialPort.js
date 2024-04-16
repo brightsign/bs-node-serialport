@@ -1,5 +1,5 @@
 // ./polyfillSerialPort.js
-
+const fs = require('fs');
 
 // Function to create v8 bindings wrapper that forwards calls to v11 bindings
 const createBindingsWrapper = () => {
@@ -11,6 +11,24 @@ const createBindingsWrapper = () => {
 
     if (!BrightSignBinding) return null;
 
+    const isFilePresent = fs.existsSync('/usr/lib/node_modules/@brightsign/serialport-nodejs/package.json');
+
+    if (isFilePresent) {
+      let spPackageVersion = require('/usr/lib/node_modules/@brightsign/serialport-nodejs/package.json').version;
+      
+      // v1.0.0 v8.x.x
+      // v2.0.0 v11.x.x
+      if (spPackageVersion.includes('2.0.0')) {
+        return BrightSignBinding;
+      }
+    }
+
+    // fs.readdir(`/usr/lib/node_modules/@brightsign/serialport-nodejs`, (err, files) => {
+    //     files.forEach(file => {
+    //         console.log(file);
+    //     });
+    // })
+
     const v8Wrapper = {};
 
     if (typeof BrightSignBinding.SerialPort === 'function' && typeof BrightSignBinding.close === 'function') {
@@ -18,9 +36,7 @@ const createBindingsWrapper = () => {
     }
 
     Object.keys(BrightSignBinding).forEach(key => {
-        v8Wrapper[key] = function (...args) {
-            return v11Bindings[key].apply(this, args);
-        }
+      v8Wrapper[key] = v11Bindings[key];
     });
 
     return v8Wrapper;

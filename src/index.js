@@ -1,10 +1,12 @@
 // Serialport's debug capabilities enable/disable
 // process.env.DEBUG ="*"
 
-const ReadlineParser = require('@serialport/parser-readline');
+const { ReadlineParser } = require('@serialport/parser-readline');
 const SerialPortListClass = require("@brightsign/serialportlist");
-const SerialPort = require('@serialport/stream');
+const { SerialPortStream } = require('@serialport/stream');
 const { compatibleBinding } = require('./polyfillSerialPort');
+
+let serialPortStream;
 
 async function main() {
   // console.log(path);
@@ -30,8 +32,9 @@ async function main() {
     }
   }
   console.log(JSON.stringify(serialPorts));
-
-  SerialPort.Binding = compatibleBinding;
+  console.log(`serial35mmPath: ${serial35mmPath}`);
+  console.log(`serialUsbPath: ${serialUsbPath}`);
+  // serialPortStream = new SerialPortStream();
 
   // Create serial ports using the selected binding
   let serialPort35mm = createSerialPort(serial35mmPath, "serialPort35mm");
@@ -45,36 +48,47 @@ function createSerialPort(path, name) {
   console.log(`Creating serial port ${name} at path: ${path}`);
 
   const options = {
-    path,
+    binding: compatibleBinding,
+    path: path,
     baudRate: 115200, // Update to reflect the expected baud rate
     dataBits: 8,
     stopBits: 1,
     parity: "none",
     autoOpen: false,
   }
+  
+  try {
+    // if v11.x.x 
+      const port = new SerialPortStream(options);
+    // else v8.x.x
+      const port = new SerialPortStream(path, options);
 
-  const port = SerialPort(path, options);
-  let parser = port.pipe(new ReadlineParser());
 
-  port.open(function (err) {
-    if (err) {
-      return console.log(`Error opening port: ${err.message}`);
-    }
-    console.log(`connected to serial ${path}, isOpen: ${port.isOpen}`);
-  });
+    let parser = port.pipe(new ReadlineParser());
 
-  // Receiver
-  parser.on('data', function (data) {
-    console.log(`Received on ${path} parsed data: ${data}`);
-  });
+    port.open(function (err) {
+      if (err) {
+        return console.log(`Error opening port: ${err.message}`);
+      }
+      console.log(`connected to serial ${path}, isOpen: ${port.isOpen}`);
+    });
 
-  // Open errors will be emitted as an error event
-  port.on('error', function (err) {
+    // Receiver
+    parser.on('data', function (data) {
+      console.log(`Received on ${path} parsed data: ${data}`);
+    });
+
+    // Open errors will be emitted as an error event
+    port.on('error', function (err) {
+      console.log(err);
+      console.log(`Error: ${err.message}`);
+    })
+
+    return port;
+  } catch (err) {
     console.log(err);
-    console.log(`Error: ${err.message}`);
-  })
-
-  return port;
+    return null;
+  }
 }
 
 // Transmitter
