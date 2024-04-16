@@ -9,14 +9,26 @@ module.exports = {
     path: path.resolve(__dirname, 'dist')
   },
   module: {
-    rules: [{
-      test: /\.tsx?$/,
-      loader: 'ts-loader',
-      options: {
-        // this will disable any type checking
-        transpileOnly: true,
+    rules: [
+      {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+        options: {
+          // this will disable any type checking
+          transpileOnly: true,
+        }
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        }
       }
-    }]
+    ]
   },
   target: 'node',
   resolve: {
