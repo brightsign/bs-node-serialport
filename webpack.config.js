@@ -9,18 +9,11 @@ module.exports = {
     path: path.resolve(__dirname, 'dist')
   },
   module: {
-    rules: [{
-      test: /\.tsx?$/,
-      loader: 'ts-loader',
-      options: {
-        // this will disable any type checking
-        transpileOnly: true,
-      }
-    }]
+    rules: []
   },
   target: 'node',
   resolve: {
-    extensions: ['.ts', '.tsx', '.js']
+    extensions: ['.js']
   },
   externals: {
     '@brightsign/serialport': 'commonjs @brightsign/serialport',
