@@ -4,7 +4,7 @@ This reference implementation is an example Node app built to demonstrate sendin
 
 It introduces an approach to write HTML, Javascript, and Node.js for the BrightSign player. This is intended to be developed on your local machine, run and tested on a BrightSign unit. BrightAuthor:connected is not required for this application.
 
-Note that this example is compatible with Node `v18.18.2` which is the version that ships with Series 5 BrightSign players running OS 9.0 or 9.1. If you are using a Series 3 or Series 4 player (which supports Node `v14.17.6`), you may need to use the older version of this example - [v1.0.0](https://github.com/brightsign/bs-node-serialport/releases/tag/v1.0.0).
+Note that this example is compatible with Node `v18.18.2` which is the version that ships with OS 9.1. If your player is on OS 8.5 or 9.0 (which supports Node `v14.17.6`), you should use the older version of this example - [v1.0.0](https://github.com/brightsign/bs-node-serialport/releases/tag/v1.0.0).
 
 ## Getting Started
 
